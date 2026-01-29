@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - Студент{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Добро пожаловать, {{ user.full_name }}!</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Ваша информация</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Группа:</strong> {{ user.group_name }}</p>
+                        <p><strong>Специальность:</strong> {{ user.specialty_code }}</p>
+                        <p><strong>Колледж ID:</strong> {{ user.college_id }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Быстрые действия</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'student_grades' %}" class="btn btn-primary">
+                                <i class="bi bi-journal-text"></i> Все оценки
+                            </a>
+                            <a href="{% url 'student_subjects' %}" class="btn btn-success">
+                                <i class="bi bi-book"></i> Мои предметы
+                            </a>
+                            <a href="{% url 'student_report' %}" class="btn btn-info">
+                                <i class="bi bi-graph-up"></i> Отчет об успеваемости
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Последние оценки</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_grades %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Предмет</th>
+                                            <th>Дата</th>
+                                            <th>Оценка</th>
+                                            <th>Компетенция</th>
+                                            <th>Комментарий</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for grade in recent_grades %}
+                                        <tr>
+                                            <td>{{ grade.subject.name }}</td>
+                                            <td>{{ grade.date|date:"d.m.Y" }}</td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if grade.grade_value >= 4 %}bg-success
+                                                    {% elif grade.grade_value == 3 %}bg-warning
+                                                    {% else %}bg-danger{% endif %}">
+                                                    {{ grade.grade_value }}
+                                                </span>
+                                            </td>
+                                            <td><code>{{ grade.competency_code }}</code></td>
+                                            <td>{{ grade.comment|truncatechars:50 }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">У вас пока нет оценок.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

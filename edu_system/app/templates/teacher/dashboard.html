@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель преподавателя{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Панель преподавателя</h1>
+        <p class="lead">Добро пожаловать, {{ user.get_full_name }}!</p>
+        
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card text-center bg-primary text-white">
+                    <div class="card-body">
+                        <h2 class="display-4">{{ subjects_count }}</h2>
+                        <p class="card-text">Предметов</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card text-center bg-success text-white">
+                    <div class="card-body">
+                        <h2 class="display-4">{{ grades_count }}</h2>
+                        <p class="card-text">Выставлено оценок</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card text-center bg-info text-white">
+                    <div class="card-body">
+                        <h2 class="display-4">{{ user.groups.count|default:"0" }}</h2>
+                        <p class="card-text">Групп</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card text-center bg-warning">
+                    <div class="card-body">
+                        <h4 class="display-4">{{ "Сегодня"|date:"d.m" }}</h4>
+                        <p class="card-text">Текущая дата</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Быстрые действия</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'add_grade' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle"></i> Выставить новую оценку
+                            </a>
+                            <a href="{% url 'teacher_groups' %}" class="btn btn-success btn-lg">
+                                <i class="bi bi-people"></i> Просмотр групп
+                            </a>
+                            <a href="{% url 'teacher_reports' %}" class="btn btn-info btn-lg">
+                                <i class="bi bi-graph-up"></i> Аналитика и отчеты
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5>Ваши предметы</h5>
+                    </div>
+                    <div class="card-body">
+                        {% with user.subject_set.all as teacher_subjects %}
+                            {% if teacher_subjects %}
+                                <ul class="list-group">
+                                    {% for subject in teacher_subjects %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ subject.name }}
+                                        <span class="badge bg-primary rounded-pill">
+                                            {{ subject.grade_set.count }}
+                                        </span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted">У вас пока нет предметов.</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Последние выставленные оценки</h5>
+                    </div>
+                    <div class="card-body">
+                        {% with user.teacher_grades.all|slice:":10" as recent_grades %}
+                            {% if recent_grades %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Студент</th>
+                                                <th>Предмет</th>
+                                                <th>Оценка</th>
+                                                <th>Дата</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for grade in recent_grades %}
+                                            <tr>
+                                                <td>{{ grade.student.get_full_name }}</td>
+                                                <td>{{ grade.subject.name }}</td>
+                                                <td>
+                                                    <span class="badge 
+                                                        {% if grade.grade_value >= 4 %}bg-success
+                                                        {% elif grade.grade_value == 3 %}bg-warning
+                                                        {% else %}bg-danger{% endif %}">
+                                                        {{ grade.grade_value }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ grade.date|date:"d.m.Y" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted">Вы еще не выставляли оценок.</p>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5>Информация по ФГОС</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-info-circle"></i> Напоминание о требованиях:</h6>
+                            <ul class="mb-0">
+                                <li>Комментарий должен быть не менее 100 символов</li>
+                                <li>В комментарии должен быть указан код компетенции</li>
+                                <li>Можно выставлять только одну оценку в неделю по предмету</li>
+                                <li>Оценка автоматически рассчитывается по проценту освоения</li>
+                            </ul>
+                        </div>
+                        
+                        <h6>Шкала оценок по ФГОС:</h6>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>Процент</th>
+                                    <th>Оценка</th>
+                                    <th>Уровень</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>86-100%</td>
+                                    <td>5</td>
+                                    <td class="text-success">Высокий</td>
+                                </tr>
+                                <tr>
+                                    <td>67-85%</td>
+                                    <td>4</td>
+                                    <td class="text-primary">Повышенный</td>
+                                </tr>
+                                <tr>
+                                    <td>48-66%</td>
+                                    <td>3</td>
+                                    <td class="text-warning">Базовый</td>
+                                </tr>
+                                <tr>
+                                    <td>0-47%</td>
+                                    <td>2</td>
+                                    <td class="text-danger">Не сформировано</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

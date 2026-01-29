@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои группы{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Мои группы</h1>
+        
+        {% if groups %}
+            <div class="row">
+                {% for group in groups %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Группа: {{ group.group_name }}</h5>
+                        </div>
+                        <div class="card-body">
+                            {% with group.student_set.all as students %}
+                                {% if students %}
+                                    <h6>Студенты в группе:</h6>
+                                    <ul class="list-group list-group-flush">
+                                        {% for student in students %}
+                                            {% if student.grade_set.filter(teacher=user).exists %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ student.get_full_name }}
+                                                <a href="#" class="btn btn-sm btn-outline-primary"
+                                                   onclick="showStudentGrades({{ student.id }})">
+                                                    Оценки
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">В этой группе нет студентов.</p>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="#" class="btn btn-sm btn-primary"
+                               onclick="showGroupAnalytics('{{ group.group_name }}')">
+                                Аналитика группы
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <h5><i class="bi bi-exclamation-triangle"></i> Нет доступных групп</h5>
+                <p>У вас нет назначенных групп. Обратитесь к администратору.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Модальное окно для отображения оценок студента -->
+<div class="modal fade" id="studentGradesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Оценки студента</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="studentGradesContent">
+                <!-- Контент загружается через AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showStudentGrades(studentId) {
+    fetch(`/api/student/${studentId}/grades/`)
+        .then(response => response.json())
+        .then(data => {
+            let content = '<table class="table table-sm">';
+            content += '<thead><tr><th>Предмет</th><th>Дата</th><th>Оценка</th><th>Комментарий</th></tr></thead>';
+            content += '<tbody>';
+            
+            data.grades.forEach(grade => {
+                content += `<tr>
+                    <td>${grade.subject}</td>
+                    <td>${grade.date}</td>
+                    <td><span class="badge ${grade.grade_value >= 4 ? 'bg-success' : grade.grade_value == 3 ? 'bg-warning' : 'bg-danger'}">${grade.grade_value}</span></td>
+                    <td>${grade.comment.substring(0, 50)}...</td>
+                </tr>`;
+            });
+            
+            content += '</tbody></table>';
+            document.getElementById('studentGradesContent').innerHTML = content;
+            
+            var modal = new bootstrap.Modal(document.getElementById('studentGradesModal'));
+            modal.show();
+        });
+}
+
+function showGroupAnalytics(groupName) {
+    alert(`Аналитика группы ${groupName} будет реализована в следующей версии.`);
+}
+</script>
+{% endblock %}

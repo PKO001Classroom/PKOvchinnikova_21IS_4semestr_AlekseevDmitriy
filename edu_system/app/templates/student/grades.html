@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои оценки{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Мои оценки</h1>
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">Все оценки</h5>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <a href="{% url 'student_report' %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-download"></i> Скачать отчет
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if grades %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Предмет</th>
+                                    <th>Дата</th>
+                                    <th>Процент</th>
+                                    <th>Оценка</th>
+                                    <th>Уровень</th>
+                                    <th>Компетенция</th>
+                                    <th>Комментарий преподавателя</th>
+                                    <th>Преподаватель</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                <tr>
+                                    <td>{{ grade.subject.name }}</td>
+                                    <td>{{ grade.date|date:"d.m.Y" }}</td>
+                                    <td>{{ grade.percentage }}%</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if grade.grade_value >= 4 %}bg-success
+                                            {% elif grade.grade_value == 3 %}bg-warning
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ grade.grade_value }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if grade.grade_value == 5 %}
+                                            <span class="text-success">Высокий</span>
+                                        {% elif grade.grade_value == 4 %}
+                                            <span class="text-primary">Повышенный</span>
+                                        {% elif grade.grade_value == 3 %}
+                                            <span class="text-warning">Базовый</span>
+                                        {% else %}
+                                            <span class="text-danger">Не сформировано</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <code class="bg-light p-1 rounded">{{ grade.competency_code }}</code>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-link" 
+                                                data-bs-toggle="popover" 
+                                                data-bs-title="Комментарий" 
+                                                data-bs-content="{{ grade.comment }}">
+                                            Показать
+                                        </button>
+                                    </td>
+                                    <td>{{ grade.teacher.get_full_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        У вас пока нет оценок.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+    })
+});
+</script>
+{% endblock %}
