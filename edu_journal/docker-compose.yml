@@ -7,7 +7,16 @@ services:
     environment:
       - DISPLAY=${DISPLAY}
       - QT_X11_NO_MITSHM=1
+      - QT_DEBUG_PLUGINS=0
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${HOME}/.Xauthority:/root/.Xauthority:rw
       - ./data:/app/data
+      - ./ui:/app/ui
+      - ./utils:/app/utils
+      - ./main.py:/app/main.py
+      - ./database.py:/app/database.py
+      - ./models.py:/app/models.py
     network_mode: host
+    stdin_open: true
+    tty: true
