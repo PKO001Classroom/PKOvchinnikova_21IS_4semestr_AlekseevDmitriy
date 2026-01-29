@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  edu-journal:
+    build: .
+    container_name: edu_journal_app
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./data:/app/data
+    network_mode: host
