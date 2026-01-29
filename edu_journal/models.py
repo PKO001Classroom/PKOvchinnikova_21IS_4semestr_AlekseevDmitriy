@@ -7,7 +7,7 @@ class User:
         self.full_name = full_name
         self.specialty = specialty
         self.group_name = group_name
-        self.created_at = created_at 
+        self.created_at = created_at
 
     def __repr__(self):
         return f"User(id={self.id}, username='{self.username}', role='{self.role}', name='{self.full_name}')"
@@ -32,6 +32,7 @@ class FgosCompetency:
         self.description = description
         self.specialty = specialty
         self.type = type  # ПК, ОПК, УК
+        self.total_indicators = 0  # Будет установлено позже
 
     def __repr__(self):
         return f"FgosCompetency(id={self.id}, code='{self.code}', type='{self.type}')"
@@ -91,13 +92,32 @@ class GradeWithDetails:
     def get_grade_description(self):
         """Получение текстового описания оценки"""
         if self.grade_value == 5:
-            return "Высокий уровень (86-100%)"
+            return "Высокий уровень (75-100%)"
         elif self.grade_value == 4:
-            return "Повышенный уровень (67-85%)"
+            return "Повышенный уровень (60-74%)"
         elif self.grade_value == 3:
-            return "Базовый уровень (48-66%)"
+            return "Базовый уровень (50-59%)"
         else:
-            return "Не сформировано (0-47%)"
+            return "Не сформировано (0-49%)"
 
     def __repr__(self):
         return f"GradeWithDetails(id={self.id}, subject='{self.subject_name}', grade={self.grade_value})"
+
+class CompetencyWithIndicators:
+    """Модель компетенции с индикаторами"""
+    def __init__(self, competency, indicators):
+        self.competency = competency
+        self.indicators = indicators
+        self.total_indicators = len(indicators)
+        
+    def get_requirements_text(self):
+        """Получение текста требований для оценок"""
+        if self.total_indicators >= 8:
+            return f"Требования: 5 (6-8 из 8), 4 (5 из 8), 3 (4 из 8), 2 (0-3 из 8)"
+        elif self.total_indicators >= 6:
+            return f"Требования: 5 (5-6 из 6), 4 (4 из 6), 3 (3 из 6), 2 (0-2 из 6)"
+        else:
+            return f"Требования: 5 (86-100%), 4 (67-85%), 3 (48-66%), 2 (0-47%)"
+    
+    def __repr__(self):
+        return f"CompetencyWithIndicators(competency={self.competency.code}, indicators={len(self.indicators)})"

@@ -290,39 +290,54 @@ class TeacherWindow(QWidget):
         
         self.update_progress()
 
-    def update_progress(self):
-        """Обновление прогресса и расчет оценки"""
-        if not self.current_competency_id:
-            self.progress_label.setText('Выберите компетенцию')
-            self.grade_label.setText('Оценка: --')
-            self.add_grade_button.setEnabled(False)
-            return
-        
-        grade_value, percentage = self.db.calculate_grade_from_indicators(
-            list(self.selected_indicators), self.current_competency_id
-        )
-        
-        # Получаем все индикаторы для подсчета
-        indicators = self.db.get_indicators_by_competency(self.current_competency_id)
-        total_indicators = len(indicators)
-        selected_count = len(self.selected_indicators)
-        
-        self.progress_label.setText(
-            f'Выбрано индикаторов: {selected_count}/{total_indicators} ({percentage:.1f}%)'
-        )
-        
-        # Устанавливаем текст оценки с цветом
-        grade_text = f'Оценка: {grade_value}'
-        grade_description = self.get_grade_description(grade_value)
-        
-        self.grade_label.setText(f'{grade_text} - {grade_description}')
-        
-        # Меняем цвет в зависимости от оценки
-        color = self.get_grade_color(grade_value)
-        self.grade_label.setStyleSheet(f'font-size: 16px; font-weight: bold; color: {color.name()};')
-        
-        # Активируем кнопку если есть выбранные индикаторы
-        self.add_grade_button.setEnabled(selected_count > 0)
+    # В метод update_progress() в teacher_window.py добавьте:
+
+def update_progress(self):
+    """Обновление прогресса и расчет оценки"""
+    if not self.current_competency_id:
+        self.progress_label.setText('Выберите компетенцию')
+        self.grade_label.setText('Оценка: --')
+        self.add_grade_button.setEnabled(False)
+        return
+    
+    grade_value, percentage = self.db.calculate_grade_from_indicators(
+        list(self.selected_indicators), self.current_competency_id
+    )
+    
+    # Получаем все индикаторы для подсчета
+    indicators = self.db.get_indicators_by_competency(self.current_competency_id)
+    total_indicators = len(indicators)
+    selected_count = len(self.selected_indicators)
+    
+    # Получаем требования для этой компетенции
+    requirements = self.get_requirements_text(total_indicators)
+    
+    self.progress_label.setText(
+        f'Выбрано индикаторов: {selected_count}/{total_indicators} ({percentage:.1f}%) | {requirements}'
+    )
+    
+    # Устанавливаем текст оценки с цветом
+    grade_text = f'Оценка: {grade_value}'
+    grade_description = self.get_grade_description(grade_value)
+    
+    self.grade_label.setText(f'{grade_text} - {grade_description}')
+    
+    # Меняем цвет в зависимости от оценки
+    color = self.get_grade_color(grade_value)
+    self.grade_label.setStyleSheet(f'font-size: 16px; font-weight: bold; color: {color.name()};')
+    
+    # Активируем кнопку если есть выбранные индикаторы
+    self.add_grade_button.setEnabled(selected_count > 0)
+
+def get_requirements_text(self, total_indicators):
+    """Получение текста требований"""
+    if total_indicators >= 8:
+        return "Требования: 5(6-8), 4(5), 3(4), 2(0-3)"
+    elif total_indicators >= 6:
+        return "Требования: 5(5-6), 4(4), 3(3), 2(0-2)"
+    else:
+        return "Требования: 5(86-100%), 4(67-85%), 3(48-66%), 2(0-47%)"
+
 
     def get_grade_description(self, grade_value):
         """Получение описания оценки"""
@@ -465,3 +480,4 @@ class TeacherWindow(QWidget):
             return QColor(255, 255, 153)  # Светло-желтый
         else:
             return QColor(255, 182, 193)  # Светло-розовый
+        
