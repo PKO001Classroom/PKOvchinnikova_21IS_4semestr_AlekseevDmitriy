@@ -192,7 +192,7 @@ pip install -r tests/requirements-dev.txt
 
 # Запустите все тесты
 cd tests
-python run_test.py
+python run_all.py
 
 # Или с использованием pytest
 pytest tests/ -v
