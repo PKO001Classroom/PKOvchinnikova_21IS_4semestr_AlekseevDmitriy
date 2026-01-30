@@ -20,15 +20,8 @@
 ```
 tests/
 ├── conftest.py          # Общие фикстуры и настройки
-├── test_database.py     # Тесты базы данных
-├── test_models.py       # Тесты моделей данных
-├── test_validators.py   # Тесты валидаторов
-├── test_calculations.py # Тесты расчетов оценок
-├── run_test.py # запуск тестов
-├── requirements-dev.txt # содержимое нужных библиотек для работы
-├── test_integration.py  # Интеграционные тесты
-└── data/
-    └── test_data.db     # Тестовая база данных
+├── requirments-dev.txt  # Нужные библеотеки для работы тестов
+└── test_all.py          # Запуск тестов
 ```
 
 ## 1. Тестирование модуля базы данных (database.py)
