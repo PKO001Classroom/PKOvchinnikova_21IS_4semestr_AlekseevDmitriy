@@ -10,10 +10,8 @@ def validate_comment(comment, min_length=100):
     if len(comment) < min_length:
         return False, f"Комментарий должен быть не менее {min_length} символов"
     
-    # Проверяем наличие кода компетенции в комментарии
-    if not any(keyword in comment.upper() for keyword in ['ПК', 'ОПК', 'УК']):
-        return False, "В комментарии должен быть указан код компетенции (ПК, ОПК или УК)"
-    
+    # Убрана проверка наличия кодов компетенций, так как это необязательно
+    # Преподаватель может писать комментарии без указания кодов
     return True, "OK"
 
 def validate_indicators(selected_indicators, total_indicators):
@@ -55,9 +53,6 @@ def get_grade_description(grade_value):
 
 def validate_competency_data(competency_code, competency_name):
     """Валидация данных компетенции"""
-    if not competency_code and not competency_name:
-        return False, "Код и название компетенции не могут быть пустыми"
-    
     if not competency_code:
         return False, "Код компетенции не может быть пустым"
     

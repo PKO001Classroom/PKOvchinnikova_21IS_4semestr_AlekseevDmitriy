@@ -538,14 +538,15 @@ class Database:
                         grade_id = cursor.lastrowid
                         
                         # Для каждой оценки добавляем соответствующие индикаторы
-                        if grade_data[3] == pk_2_2_id:  # ПК 2.2
+                        if grade_data[3] == pk_2_2_id:  # ПК 2.2 - добавляем 6 индикаторов
                             cursor.execute("SELECT id FROM fgos_indicators WHERE code LIKE 'ПК 2.2.%' LIMIT 6")
-                        elif grade_data[3] == opk_3_1_id:  # ОПК 3.1
+                            indicator_ids = [row[0] for row in cursor.fetchall()]
+                        elif grade_data[3] == opk_3_1_id:  # ОПК 3.1 - добавляем 4 индикатора
                             cursor.execute("SELECT id FROM fgos_indicators WHERE code LIKE 'ОПК 3.1.%' LIMIT 4")
-                        else:  # УК 3.1
+                            indicator_ids = [row[0] for row in cursor.fetchall()]
+                        else:  # УК 3.1 - добавляем 3 индикатора
                             cursor.execute("SELECT id FROM fgos_indicators WHERE code LIKE 'УК 3.1.%' LIMIT 3")
-                        
-                        indicator_ids = [row[0] for row in cursor.fetchall()]
+                            indicator_ids = [row[0] for row in cursor.fetchall()]
                         
                         for indicator_id in indicator_ids:
                             cursor.execute(
@@ -566,7 +567,7 @@ class Database:
             print("✗ Не удалось подключиться к базе данных")
 
     def execute_query(self, query, params=()):
-        """Выполнение SQL-запроса"""
+        """Выполнение SQL-запроса (INSERT, UPDATE, DELETE)"""
         try:
             cursor = self.connection.cursor()
             cursor.execute(query, params)
@@ -576,16 +577,26 @@ class Database:
             print(f"Error executing query: {e}")
             return None
 
+    def execute_select(self, query, params=()):
+        """Выполнение SELECT запроса (без коммита)"""
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(query, params)
+            return cursor
+        except Error as e:
+            print(f"Error executing select: {e}")
+            return None
+
     def fetch_all(self, query, params=()):
         """Получение всех результатов запроса"""
-        cursor = self.execute_query(query, params)
+        cursor = self.execute_select(query, params)
         if cursor:
             return cursor.fetchall()
         return []
 
     def fetch_one(self, query, params=()):
         """Получение одного результата запроса"""
-        cursor = self.execute_query(query, params)
+        cursor = self.execute_select(query, params)
         if cursor:
             return cursor.fetchone()
         return None
@@ -751,6 +762,13 @@ if __name__ == "__main__":
         # Пример получения компетенций
         competencies = db.fetch_all("SELECT * FROM fgos_competencies")
         print(f"Всего компетенций: {len(competencies)}")
+        
+        # Проверяем индикаторы для ПК 2.2
+        cursor = db.connection.cursor()
+        cursor.execute("SELECT id FROM fgos_competencies WHERE code = 'ПК 2.2'")
+        pk_2_2_id = cursor.fetchone()[0]
+        indicators = db.get_indicators_by_competency(pk_2_2_id)
+        print(f"Всего индикаторов для ПК 2.2: {len(indicators)}")
         
         # Закрываем соединение
         db.close()
