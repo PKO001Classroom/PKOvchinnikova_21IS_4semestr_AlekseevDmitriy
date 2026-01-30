@@ -3,7 +3,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://python.org)
 [![PyQt5](https://img.shields.io/badge/GUI-PyQt5-green)](https://www.riverbankcomputing.com/software/pyqt/)
-[![Docker](https://img.shields.io/badge/Docker-поддерживается-blue)](https://docker.com)
+[![Docker](https://img.shields.io/badge/Docker-поддерживается, но на данный момент не работает-blue)](https://docker.com)
 
 ## Содержание
 1. [Описание](#описание)
