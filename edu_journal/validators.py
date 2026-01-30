@@ -55,6 +55,9 @@ def get_grade_description(grade_value):
 
 def validate_competency_data(competency_code, competency_name):
     """Валидация данных компетенции"""
+    if not competency_code and not competency_name:
+        return False, "Код и название компетенции не могут быть пустыми"
+    
     if not competency_code:
         return False, "Код компетенции не может быть пустым"
     
