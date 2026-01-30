@@ -5,10 +5,14 @@ import os
 class Database:
     def __init__(self, db_path=None):
         if db_path is None:
-            # Создаем папку data если ее нет
-            if not os.path.exists('data'):
-                os.makedirs('data')
-            db_path = 'data/edu_journal.db'
+            # Указание жесткого пути к базе данных
+            db_path = r'C:\dmitiy\PKOvchinnikova_21IS_4semestr_AlekseevDmitriy\edu_journal\data\edu_journal.db'
+        
+        # Проверяем существование директории и создаем при необходимости
+        db_dir = os.path.dirname(db_path)
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir)
+            print(f"✓ Создана директория: {db_dir}")
         
         print(f"Используется база данных: {os.path.abspath(db_path)}")
         self.db_path = db_path
@@ -20,19 +24,12 @@ class Database:
         try:
             self.connection = sqlite3.connect(self.db_path)
             print(f"✓ Подключение к базе данных установлено")
+            print(f"✓ База данных находится в: {os.path.abspath(self.db_path)}")
             return self.connection
         except Error as e:
             print(f"✗ Ошибка подключения к базе данных: {e}")
             print(f"Путь: {self.db_path}")
-            # Пробуем создать базу в текущей директории
-            try:
-                self.db_path = 'edu_journal.db'
-                self.connection = sqlite3.connect(self.db_path)
-                print(f"✓ База данных создана в текущей папке: {self.db_path}")
-                return self.connection
-            except Error as e2:
-                print(f"✗ Критическая ошибка: {e2}")
-                return None
+            return None
 
     def init_database(self):
         """Инициализация базы данных с тестовыми данными по ФГОС"""
@@ -441,7 +438,7 @@ class Database:
                         # Индикаторы для УК 2.2 (6 пунктов)
                         (competencies_dict['УК 2.2'], 'УК 2.2.1', 'Нашел информацию в библиотеке', 1, 1),
                         (competencies_dict['УК 2.2'], 'УК 2.2.2', 'Использовал базы данных', 2, 1),
-                        (competencies_dict['УК 2.2'], 'УК 2.2.3', 'Работал с научной литературой', 2, 1),
+                        (competencies_dict['УК 2.2'], 'УК 2.2.3', 'Работал с научной литература', 2, 1),
                         (competencies_dict['УК 2.2'], 'УК 2.2.4', 'Применил справочные материалы', 1, 1),
                         (competencies_dict['УК 2.2'], 'УК 2.2.5', 'Сравнил разные источники', 2, 1),
                         (competencies_dict['УК 2.2'], 'УК 2.2.6', 'Систематизировал найденную информацию', 1, 1),
@@ -734,3 +731,26 @@ class Database:
         if self.connection:
             self.connection.close()
             print("Database connection closed")
+
+
+# Пример использования
+if __name__ == "__main__":
+    # Создаем базу данных по указанному пути
+    db = Database()
+    
+    # Проверяем соединение
+    if db.connection:
+        # Пример запроса
+        users = db.fetch_all("SELECT * FROM users")
+        print(f"Всего пользователей: {len(users)}")
+        
+        # Пример получения предметов
+        subjects = db.fetch_all("SELECT * FROM subjects")
+        print(f"Всего предметов: {len(subjects)}")
+        
+        # Пример получения компетенций
+        competencies = db.fetch_all("SELECT * FROM fgos_competencies")
+        print(f"Всего компетенций: {len(competencies)}")
+        
+        # Закрываем соединение
+        db.close()
