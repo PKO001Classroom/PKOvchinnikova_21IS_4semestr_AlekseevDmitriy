@@ -5,18 +5,6 @@ import os
 # Добавляем путь к исходному коду
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from validators import (
-    validate_comment,
-    validate_indicators,
-    validate_competency_data,
-    validate_indicator_data,
-    calculate_grade_by_count,
-    calculate_grade_from_percentage,
-    get_grade_requirements,
-    get_grade_description,
-    calculate_percentage_from_indicators
-)
-
 def validate_comment(comment, min_length=100):
     """Валидация комментария"""
     if len(comment) < min_length:
