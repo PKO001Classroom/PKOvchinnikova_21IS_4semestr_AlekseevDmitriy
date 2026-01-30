@@ -1,0 +1,76 @@
+@startuml
+' Цветовая схема для наглядности
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor #333
+}
+
+' Класс Пользователь (родиaтельский для Учителя и Круга)
+class User {
+  - id: int
+  - email: String
+  - name: String
+  - password: String
+  --
+  + login()
+  + authenticate()
+}
+
+' Класс Данные (ассоциирован с Кругом)
+class Data {
+  - group: String
+}
+
+' Класс Круг (наследует от User)
+class Circle {
+  - idCourse: int
+  - nameCourse: String
+  - semester: int
+  --
+  + checkGrade()
+}
+
+' Класс Оценки
+class Grade {
+  - idGrade: int
+  - value: int
+  - date: Date
+  - comment: String
+  --
+  + calculateAVG()
+  + updateGrade()
+}
+
+' Класс Предмет
+class Subject {
+  - idSub: int
+  - nameSub: String
+}
+
+' Класс Учитель (наследует от User)
+class Teacher {
+  - idTeach: int
+  - nameTeach: String
+  --
+  + addGrade()
+  + addComment()
+}
+
+' Наследование
+User <|-- Circle
+User <|-- Teacher
+
+' Ассоциации
+Circle "1" -- "1" Data : имеет >
+Circle "1" -- "*" Grade : получает >
+Teacher "1" -- "*" Grade : ставит >
+Subject "1" -- "*" Grade : относится к >
+Teacher "*" -- "*" Subject : преподает >
+
+' Примечание для пояснения
+note top of Grade
+  Date может быть заменен на int,
+  если хранится как timestamp
+end note
+@enduml

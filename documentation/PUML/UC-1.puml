@@ -1,0 +1,23 @@
+@startuml
+left to right direction
+skinparam usecase {
+    BackgroundColor LightYellow
+    BorderColor DarkGray
+}
+
+actor "Пользователь" as User
+actor "Учитель" as Teacher
+actor "Студент" as Student
+
+User --> (Аутентификация)
+(Аутентификация) .> (Проверка роли) : include
+(Проверка роли) .> (Проверка группы доступа) : include
+
+(Аутентификация) <.. (Ввод неверных данных) : extend
+(Проверка группы доступа) <.. (Отсутствие групп) : extend
+
+(Аутентификация) --> Teacher : Роль = учитель
+(Аутентификация) --> Student : Роль = студент
+(Проверка группы доступа) --> (Ограниченный доступ)
+
+@enduml
